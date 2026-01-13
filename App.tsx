@@ -10,6 +10,7 @@ import Settings from './components/Settings';
 import Login from './components/Login';
 import Prospector from './components/Prospector';
 import { StorageService } from './services/storageService';
+import { GoogleWorkspaceService } from './services/googleService';
 
 const AUTH_KEY = 'recnxt_auth_session';
 
@@ -44,10 +45,27 @@ const App: React.FC = () => {
     setIsAuthenticated(false);
   };
 
+  // Sync logic for Google Workspace
+  const syncWithGoogle = async (newClients: Client[]) => {
+    try {
+      const configStr = localStorage.getItem('recnxt_workspace_config');
+      if (configStr) {
+        const config = JSON.parse(configStr);
+        if (config.isConnected && config.spreadsheetId) {
+          await GoogleWorkspaceService.syncClientsToSheet(config.spreadsheetId, newClients);
+          console.log("Synced with Google Sheets");
+        }
+      }
+    } catch (err) {
+      console.error("Sync failed:", err);
+    }
+  };
+
   const handleUpdateClient = (updatedClient: Client) => {
     const newClients = clients.map(c => c.id === updatedClient.id ? updatedClient : c);
     setClients(newClients);
     StorageService.saveClients(newClients);
+    syncWithGoogle(newClients);
 
     if (selectedClient?.id === updatedClient.id) {
       setSelectedClient(updatedClient);
@@ -58,14 +76,17 @@ const App: React.FC = () => {
     const newClients = [...clients, newClient];
     setClients(newClients);
     StorageService.saveClients(newClients);
+    syncWithGoogle(newClients);
   };
 
   const handleDeleteClient = (clientId: string) => {
     const newClients = clients.filter(c => c.id !== clientId);
     setClients(newClients);
     StorageService.saveClients(newClients);
+    syncWithGoogle(newClients);
     setSelectedClient(null);
   };
+
 
   if (isLoading) {
     return (
