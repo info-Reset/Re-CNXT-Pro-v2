@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => {
       'process.env': env,
       'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+      'process.env.GOOGLE_CLIENT_ID': JSON.stringify(env.GOOGLE_CLIENT_ID),
       'process.env.APP_ACCESS_KEY': JSON.stringify(env.APP_ACCESS_KEY || 'admin123')
     },
     resolve: {

@@ -10,10 +10,11 @@ declare global {
 }
 
 export const GOOGLE_CONFIG = {
-  // Replace this string with your actual Client ID after creating it in Google Cloud Console
-  CLIENT_ID: 'PASTE_YOUR_CLIENT_ID_HERE.apps.googleusercontent.com', 
+  // Uses the Client ID from environment variables (set in GitHub Secrets)
+  CLIENT_ID: process.env.GOOGLE_CLIENT_ID || 'PASTE_YOUR_CLIENT_ID_HERE.apps.googleusercontent.com',
   SCOPES: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/documents',
 };
+
 
 export class GoogleWorkspaceService {
   private static tokenClient: any = null;
@@ -44,7 +45,7 @@ export class GoogleWorkspaceService {
       if (!this.tokenClient) {
         this.init();
       }
-      
+
       if (!this.tokenClient) {
         reject("Google Identity Services not loaded. Check your index.html scripts.");
         return;
@@ -57,14 +58,14 @@ export class GoogleWorkspaceService {
         this.accessToken = response.access_token;
         resolve(response.access_token);
       };
-      
+
       this.tokenClient.requestAccessToken({ prompt: 'consent' });
     });
   }
 
   static async createClientFolder(clientName: string, parentFolderId: string) {
     if (!this.accessToken) throw new Error("Not authenticated");
-    
+
     const response = await fetch('https://www.googleapis.com/drive/v3/files', {
       method: 'POST',
       headers: {
@@ -77,7 +78,7 @@ export class GoogleWorkspaceService {
         parents: [parentFolderId],
       }),
     });
-    
+
     return await response.json();
   }
 }
