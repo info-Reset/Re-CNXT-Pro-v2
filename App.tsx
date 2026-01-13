@@ -24,11 +24,11 @@ const App: React.FC = () => {
   useEffect(() => {
     const session = localStorage.getItem(AUTH_KEY);
     const masterKey = process.env.APP_ACCESS_KEY || 'admin123';
-    
+
     if (session === masterKey) {
       setIsAuthenticated(true);
     }
-    
+
     const data = StorageService.getClients();
     setClients(data);
     setIsLoading(false);
@@ -39,11 +39,16 @@ const App: React.FC = () => {
     setIsAuthenticated(true);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem(AUTH_KEY);
+    setIsAuthenticated(false);
+  };
+
   const handleUpdateClient = (updatedClient: Client) => {
     const newClients = clients.map(c => c.id === updatedClient.id ? updatedClient : c);
     setClients(newClients);
     StorageService.saveClients(newClients);
-    
+
     if (selectedClient?.id === updatedClient.id) {
       setSelectedClient(updatedClient);
     }
@@ -80,14 +85,15 @@ const App: React.FC = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
       {/* Sidebar */}
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout} />
+
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto p-6 md:p-12 scroll-smooth">
         {selectedClient ? (
-          <ClientDetailView 
-            client={selectedClient} 
-            onBack={() => setSelectedClient(null)} 
+          <ClientDetailView
+            client={selectedClient}
+            onBack={() => setSelectedClient(null)}
             onUpdate={handleUpdateClient}
             onDelete={() => handleDeleteClient(selectedClient.id)}
           />
@@ -97,8 +103,8 @@ const App: React.FC = () => {
               <Dashboard clients={clients} onSelectClient={setSelectedClient} />
             )}
             {activeTab === 'clients' && (
-              <ClientList 
-                clients={clients} 
+              <ClientList
+                clients={clients}
                 onSelectClient={setSelectedClient}
                 onAddClient={handleAddClient}
               />
