@@ -81,4 +81,38 @@ export class GoogleWorkspaceService {
 
     return await response.json();
   }
+  static async updateSpreadsheetValues(spreadsheetId: string, values: any[][]) {
+    if (!this.accessToken) throw new Error("Not authenticated");
+
+    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1?valueInputOption=USER_ENTERED`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        values: values
+      }),
+    });
+
+    return await response.json();
+  }
+
+  static async syncClientsToSheet(spreadsheetId: string, clients: any[]) {
+    // Format headers and rows
+    const headers = ['ID', 'Name', 'Company', 'Email', 'Phone', 'Status', 'Total Revenue', 'Notes', 'Created At'];
+    const rows = clients.map(client => [
+      client.id,
+      client.name,
+      client.company,
+      client.email,
+      client.phone,
+      client.status,
+      client.totalRevenue,
+      client.notes,
+      client.createdAt
+    ]);
+
+    return await this.updateSpreadsheetValues(spreadsheetId, [headers, ...rows]);
+  }
 }
