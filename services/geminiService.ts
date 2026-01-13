@@ -1,9 +1,16 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+
+if (!ai) {
+  console.warn("Gemini API Key not found. AI features will be disabled.");
+}
+
 
 export const analyzeLead = async (clientName: string, notes: string) => {
+  if (!ai) return null;
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -18,7 +25,7 @@ export const analyzeLead = async (clientName: string, notes: string) => {
           properties: {
             summary: { type: Type.STRING },
             leadQuality: { type: Type.NUMBER },
-            suggestedProjects: { 
+            suggestedProjects: {
               type: Type.ARRAY,
               items: { type: Type.STRING }
             },
@@ -36,6 +43,7 @@ export const analyzeLead = async (clientName: string, notes: string) => {
 };
 
 export const draftEmail = async (clientName: string, context: string) => {
+  if (!ai) return "AI service unavailable";
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -56,6 +64,7 @@ export const draftEmail = async (clientName: string, context: string) => {
  * Uses Google Maps grounding to find local business leads
  */
 export const searchProspects = async (query: string, lat?: number, lng?: number) => {
+  if (!ai) return null;
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -85,6 +94,7 @@ export const searchProspects = async (query: string, lat?: number, lng?: number)
  * Generates a website mockup concept using Gemini Image Gen
  */
 export const generateMockup = async (prompt: string) => {
+  if (!ai) return null;
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
