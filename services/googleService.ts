@@ -34,13 +34,35 @@ export class GoogleWorkspaceService {
           if (response.access_token) {
             this.accessToken = response.access_token;
             console.log("Workspace connected successfully");
+            // Optionally store a hint that we're connected
+            localStorage.setItem('google_workspace_connected', 'true');
           }
         },
       });
     }
   }
 
-  static connect(): Promise<string> {
+  static isAuthorized(): boolean {
+    return !!this.accessToken;
+  }
+
+  static async getAccessToken(): Promise<string> {
+    if (this.accessToken) return this.accessToken;
+
+    const wasConnected = localStorage.getItem('google_workspace_connected') === 'true';
+    if (wasConnected) {
+      try {
+        return await this.connect(true); // Attempt silent re-auth
+      } catch (err) {
+        console.warn("Silent re-auth failed, manual connection required");
+        localStorage.removeItem('google_workspace_connected');
+      }
+    }
+
+    throw new Error("User not authorized. Please connect Workspace in Settings.");
+  }
+
+  static connect(silent: boolean = false): Promise<string> {
     return new Promise((resolve, reject) => {
       if (!this.tokenClient) {
         this.init();
@@ -54,22 +76,28 @@ export class GoogleWorkspaceService {
       this.tokenClient.callback = (response: any) => {
         if (response.error) {
           reject(response);
+          return;
         }
         this.accessToken = response.access_token;
+        localStorage.setItem('google_workspace_connected', 'true');
         resolve(response.access_token);
       };
 
-      this.tokenClient.requestAccessToken({ prompt: 'consent' });
+      if (silent) {
+        this.tokenClient.requestAccessToken({ prompt: '' });
+      } else {
+        this.tokenClient.requestAccessToken({ prompt: 'consent' });
+      }
     });
   }
 
   static async createClientFolder(clientName: string, parentFolderId: string) {
-    if (!this.accessToken) throw new Error("Not authenticated");
+    const token = await this.getAccessToken();
 
     const response = await fetch('https://www.googleapis.com/drive/v3/files', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.accessToken}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -79,21 +107,32 @@ export class GoogleWorkspaceService {
       }),
     });
 
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Drive Error: ${error.error?.message || response.statusText}`);
+    }
+
     return await response.json();
   }
-  static async updateSpreadsheetValues(spreadsheetId: string, values: any[][]) {
-    if (!this.accessToken) throw new Error("Not authenticated");
 
-    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1?valueInputOption=USER_ENTERED`, {
+  static async updateSpreadsheetValues(spreadsheetId: string, values: any[][], range: string = 'Sheet1!A1') {
+    const token = await this.getAccessToken();
+
+    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?valueInputOption=USER_ENTERED`, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${this.accessToken}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         values: values
       }),
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Sheets Error: ${error.error?.message || response.statusText}`);
+    }
 
     return await response.json();
   }

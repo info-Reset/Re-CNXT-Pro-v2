@@ -28,10 +28,15 @@ const WorkspaceSettings: React.FC = () => {
       setConfig(prev => ({ ...prev, isConnected: true, lastSync: new Date().toISOString() }));
     } catch (err) {
       console.error(err);
-      alert("Connection failed. Please ensure your Google Client ID is valid in googleService.ts");
+      alert("Connection failed. Please ensure your Google Client ID is valid in googleService.ts and you have enabled the required APIs.");
     } finally {
       setIsConnecting(false);
     }
+  };
+
+  const handleDisconnect = () => {
+    localStorage.removeItem('google_workspace_connected');
+    setConfig(prev => ({ ...prev, isConnected: false }));
   };
 
   const handleIdInput = (field: 'spreadsheetId' | 'rootFolderId', value: string) => {
@@ -62,7 +67,7 @@ const WorkspaceSettings: React.FC = () => {
           <p className="text-xs text-slate-500 mb-8 leading-relaxed">Connect your account to enable real-time syncing of client data and project folders.</p>
 
           {!config.isConnected ? (
-            <button 
+            <button
               onClick={handleConnect}
               disabled={isConnecting}
               className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center uppercase tracking-widest text-xs"
@@ -76,8 +81,8 @@ const WorkspaceSettings: React.FC = () => {
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Last Handshake</p>
                 <p className="text-sm font-bold text-slate-700">{config.lastSync ? new Date(config.lastSync).toLocaleString() : 'Never'}</p>
               </div>
-              <button 
-                onClick={() => setConfig({...config, isConnected: false})}
+              <button
+                onClick={handleDisconnect}
                 className="w-full border border-slate-200 text-slate-500 font-black py-4 rounded-2xl hover:bg-slate-50 transition-all text-[10px] uppercase tracking-widest"
               >
                 Terminate Connection
@@ -97,13 +102,13 @@ const WorkspaceSettings: React.FC = () => {
               <p className="text-xs text-slate-500">Mapping Google IDs</p>
             </div>
           </div>
-          
+
           <div className="space-y-6">
             <div>
               <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest px-1">Spreadsheet URL / ID</label>
-              <input 
-                type="text" 
-                placeholder="Paste Master Sheet URL..." 
+              <input
+                type="text"
+                placeholder="Paste Master Sheet URL..."
                 className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 text-sm font-bold text-slate-700"
                 value={config.spreadsheetId}
                 onChange={(e) => handleIdInput('spreadsheetId', e.target.value)}
@@ -111,9 +116,9 @@ const WorkspaceSettings: React.FC = () => {
             </div>
             <div>
               <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest px-1">Root Folder URL / ID</label>
-              <input 
-                type="text" 
-                placeholder="Paste Drive Folder URL..." 
+              <input
+                type="text"
+                placeholder="Paste Drive Folder URL..."
                 className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 text-sm font-bold text-slate-700"
                 value={config.rootFolderId}
                 onChange={(e) => handleIdInput('rootFolderId', e.target.value)}
@@ -131,7 +136,7 @@ const WorkspaceSettings: React.FC = () => {
           <div>
             <h3 className="text-2xl font-black mb-6 tracking-tight">The "Serverless" Secret</h3>
             <p className="text-slate-400 leading-relaxed mb-8">
-              Because GitHub Pages doesn't offer a database, your app creates its own bridge to Google. 
+              Because GitHub Pages doesn't offer a database, your app creates its own bridge to Google.
               Your data never touches a 3rd party server—it goes directly from your browser to your Google account.
             </p>
             <div className="flex gap-4">
@@ -145,7 +150,7 @@ const WorkspaceSettings: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white/5 p-6 rounded-[2rem] border border-white/10 text-center">
               <p className="text-3xl font-black text-white mb-1">0ms</p>

@@ -53,11 +53,19 @@ const App: React.FC = () => {
         const config = JSON.parse(configStr);
         if (config.isConnected && config.spreadsheetId) {
           await GoogleWorkspaceService.syncClientsToSheet(config.spreadsheetId, newClients);
-          console.log("Synced with Google Sheets");
+          console.log("✅ Synced with Google Sheets (Sheet1)");
         }
       }
-    } catch (err) {
-      console.error("Sync failed:", err);
+    } catch (err: any) {
+      console.error("❌ Sync failed:", err.message || err);
+      // If it's an auth error, we might want to update the connected status
+      if (err.message?.includes("not authorized")) {
+        const configStr = localStorage.getItem('recnxt_workspace_config');
+        if (configStr) {
+          const config = JSON.parse(configStr);
+          localStorage.setItem('recnxt_workspace_config', JSON.stringify({ ...config, isConnected: false }));
+        }
+      }
     }
   };
 
