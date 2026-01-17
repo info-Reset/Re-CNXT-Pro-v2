@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Client, ProjectStatus, ClientStatus, CreativeMockup, Project } from '../types';
+import { Client, ProjectStatus, ClientStatus, CreativeMockup, Project, Task } from '../types';
 import { analyzeLead, draftEmail, generateMockup } from '../services/geminiService';
 
 interface ClientDetailViewProps {
@@ -126,6 +126,55 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
     onUpdate({ ...client, projects: updatedProjects });
   };
 
+  const handleUpdateProjectStatus = (projectId: string, status: ProjectStatus) => {
+    const updatedProjects = client.projects.map(p =>
+      p.id === projectId ? { ...p, status } : p
+    );
+    onUpdate({ ...client, projects: updatedProjects });
+  };
+
+  const calculateProgress = (tasks: Task[]) => {
+    if (tasks.length === 0) return 0;
+    const completed = tasks.filter(t => t.completed).length;
+    return Math.round((completed / tasks.length) * 100);
+  };
+
+  const handleAddTask = (projectId: string, title: string) => {
+    if (!title.trim()) return;
+    const updatedProjects = client.projects.map(p => {
+      if (p.id === projectId) {
+        const newTasks = [...p.tasks, { id: Date.now().toString(), title, completed: false }];
+        return { ...p, tasks: newTasks, progress: calculateProgress(newTasks) };
+      }
+      return p;
+    });
+    onUpdate({ ...client, projects: updatedProjects });
+  };
+
+  const handleToggleTask = (projectId: string, taskId: string) => {
+    const updatedProjects = client.projects.map(p => {
+      if (p.id === projectId) {
+        const newTasks = p.tasks.map(t =>
+          t.id === taskId ? { ...t, completed: !t.completed } : t
+        );
+        return { ...p, tasks: newTasks, progress: calculateProgress(newTasks) };
+      }
+      return p;
+    });
+    onUpdate({ ...client, projects: updatedProjects });
+  };
+
+  const handleDeleteTask = (projectId: string, taskId: string) => {
+    const updatedProjects = client.projects.map(p => {
+      if (p.id === projectId) {
+        const newTasks = p.tasks.filter(t => t.id !== taskId);
+        return { ...p, tasks: newTasks, progress: calculateProgress(newTasks) };
+      }
+      return p;
+    });
+    onUpdate({ ...client, projects: updatedProjects });
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-20">
       <button
@@ -151,9 +200,9 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
                   value={client.status}
                   onChange={(e) => handleStatusChange(e.target.value as ClientStatus)}
                   className={`w-full text-center appearance-none px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-colors cursor-pointer focus:outline-none focus:ring-4 focus:ring-indigo-500/10 ${client.status === ClientStatus.ACTIVE ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                      client.status === ClientStatus.LEAD ? 'bg-indigo-50 text-indigo-700 border-indigo-100' :
-                        client.status === ClientStatus.POTENTIAL ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                          'bg-slate-100 text-slate-500 border-slate-200'
+                    client.status === ClientStatus.LEAD ? 'bg-indigo-50 text-indigo-700 border-indigo-100' :
+                      client.status === ClientStatus.POTENTIAL ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                        'bg-slate-100 text-slate-500 border-slate-200'
                     }`}
                 >
                   <option value={ClientStatus.LEAD}>Fresh Start</option>
@@ -334,9 +383,15 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
                         <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Started {new Date(project.startDate).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-600 border border-indigo-100">
-                      {project.status}
-                    </span>
+                    <select
+                      value={project.status}
+                      onChange={(e) => handleUpdateProjectStatus(project.id, e.target.value as ProjectStatus)}
+                      className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-600 border border-indigo-100 outline-none cursor-pointer hover:bg-indigo-100 transition-colors"
+                    >
+                      {Object.values(ProjectStatus).map(s => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
@@ -354,8 +409,8 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
                       <button
                         onClick={() => project.driveLink ? window.open(ensureProtocol(project.driveLink), '_blank') : handleLinkResource(project.id, 'drive')}
                         className={`flex-1 flex items-center justify-center py-3 rounded-2xl text-[10px] font-black transition-all uppercase tracking-widest border ${project.driveLink
-                            ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
-                            : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600'
+                          ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
+                          : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600'
                           }`}
                       >
                         <i className={`fab fa-google-drive mr-2 text-xs ${project.driveLink ? 'text-blue-500' : 'text-slate-300'}`}></i>
@@ -364,13 +419,62 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
                       <button
                         onClick={() => project.sheetLink ? window.open(ensureProtocol(project.sheetLink), '_blank') : handleLinkResource(project.id, 'sheet')}
                         className={`flex-1 flex items-center justify-center py-3 rounded-2xl text-[10px] font-black transition-all uppercase tracking-widest border ${project.sheetLink
-                            ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
-                            : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600'
+                          ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                          : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600'
                           }`}
                       >
                         <i className={`far fa-file-excel mr-2 text-xs ${project.sheetLink ? 'text-emerald-500' : 'text-slate-300'}`}></i>
                         {project.sheetLink ? 'Open Tracker' : '+ Link Tracker'}
                       </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 pt-8 border-t border-slate-100">
+                    <div className="flex justify-between items-center mb-4">
+                      <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tasks & Milestones</h5>
+                      <span className="text-[10px] font-bold text-slate-400">{project.tasks.filter(t => t.completed).length} / {project.tasks.length} Done</span>
+                    </div>
+                    <div className="space-y-2 mb-4 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                      {project.tasks.map(task => (
+                        <div key={task.id} className="flex items-center justify-between group/task bg-slate-50/50 p-3 rounded-xl border border-transparent hover:border-slate-100 transition-all">
+                          <div className="flex items-center space-x-3">
+                            <input
+                              type="checkbox"
+                              checked={task.completed}
+                              onChange={() => handleToggleTask(project.id, task.id)}
+                              className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <span className={`text-sm font-semibold transition-all ${task.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+                              {task.title}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteTask(project.id, task.id)}
+                            className="opacity-0 group-hover/task:opacity-100 text-slate-300 hover:text-rose-500 transition-all"
+                          >
+                            <i className="fas fa-trash-can text-xs"></i>
+                          </button>
+                        </div>
+                      ))}
+                      {project.tasks.length === 0 && (
+                        <p className="text-xs text-slate-400 italic text-center py-2">No tasks added yet. Breakdown the scope below!</p>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Add a new task..."
+                        className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/5 pr-12"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleAddTask(project.id, e.currentTarget.value);
+                            e.currentTarget.value = '';
+                          }
+                        }}
+                      />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                        <i className="fas fa-plus text-[10px] text-slate-300"></i>
+                      </div>
                     </div>
                   </div>
 
