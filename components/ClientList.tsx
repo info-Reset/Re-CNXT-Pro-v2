@@ -77,8 +77,8 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
               key={s}
               onClick={() => setFilter(s as any)}
               className={`px-4 py-2.5 text-[10px] rounded-xl font-black uppercase tracking-widest transition-all ${filter === s
-                  ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-600'
+                ? 'bg-white text-indigo-600 shadow-sm'
+                : 'text-slate-400 hover:text-slate-600'
                 }`}
             >
               {s}
@@ -94,7 +94,7 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
               <tr>
                 <th className="px-8 py-5">Profile</th>
                 <th className="px-8 py-5">Status</th>
-                <th className="px-8 py-5">Activity</th>
+                <th className="px-8 py-5">Engagement Count</th>
                 <th className="px-8 py-5">CTV</th>
                 <th className="px-8 py-5"></th>
               </tr>
@@ -119,18 +119,24 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
                   </td>
                   <td className="px-8 py-6">
                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${client.status === ClientStatus.ACTIVE ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                        client.status === ClientStatus.LEAD ? 'bg-indigo-50 text-indigo-700 border-indigo-100' :
-                          client.status === ClientStatus.POTENTIAL ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                            'bg-slate-100 text-slate-500 border-slate-200'
+                      client.status === ClientStatus.LEAD ? 'bg-indigo-50 text-indigo-700 border-indigo-100' :
+                        client.status === ClientStatus.POTENTIAL ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                          'bg-slate-100 text-slate-500 border-slate-200'
                       }`}>
                       {client.status}
                     </span>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="text-xs font-bold text-slate-600">{client.projects.length} Campaigns</p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
-                      {client.projects.filter(p => p.status === 'In Progress').length} Active
-                    </p>
+                    <div className="flex items-center space-x-3">
+                      <div className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl font-black text-xs border border-indigo-100">
+                        {client.projects.length}
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest line-clamp-1">
+                          {client.projects.filter(p => p.status === 'In Progress').length || 0} Active
+                        </p>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-8 py-6">
                     <p className="text-sm font-black text-slate-900">${client.totalRevenue.toLocaleString()}</p>

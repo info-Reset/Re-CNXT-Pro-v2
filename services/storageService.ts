@@ -53,4 +53,13 @@ export class StorageService {
       this.saveClients(clients);
     }
   }
+
+  static getFullBackup(): any {
+    return {
+      clients: this.getClients(),
+      profile: this.getProfile(),
+      exportDate: new Date().toISOString(),
+      version: '2.0.0'
+    };
+  }
 }

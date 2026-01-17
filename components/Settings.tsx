@@ -33,15 +33,15 @@ const Settings: React.FC = () => {
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">Control Center</h2>
           <p className="text-slate-500 font-medium">Configure your agency identity and cloud infrastructure.</p>
         </div>
-        
+
         <div className="flex p-1 bg-slate-200/50 rounded-2xl border border-slate-200">
-          <button 
+          <button
             onClick={() => setActiveSubTab('profile')}
             className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${activeSubTab === 'profile' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
             Agency Profile
           </button>
-          <button 
+          <button
             onClick={() => setActiveSubTab('cloud')}
             className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${activeSubTab === 'cloud' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
@@ -62,26 +62,26 @@ const Settings: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Agency Brand Name</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 text-sm font-bold text-slate-700"
                       value={profile.name}
-                      onChange={(e) => setProfile({...profile, name: e.target.value})}
+                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Digital Headquarters (URL)</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 text-sm font-bold text-slate-700"
                       value={profile.website}
-                      onChange={(e) => setProfile({...profile, website: e.target.value})}
+                      onChange={(e) => setProfile({ ...profile, website: e.target.value })}
                     />
                   </div>
                 </div>
-                
+
                 <div className="pt-4">
-                  <button 
+                  <button
                     onClick={handleSave}
                     disabled={isSaving}
                     className="w-full bg-slate-900 hover:bg-slate-800 text-white font-black py-5 rounded-2xl shadow-xl shadow-slate-900/10 transition-all disabled:opacity-50 uppercase tracking-widest text-xs"
@@ -111,7 +111,21 @@ const Settings: React.FC = () => {
                 <span className="px-4 py-1.5 bg-emerald-500 text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-emerald-500/20">Active</span>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <button className="py-4 bg-slate-50 border border-slate-200 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center justify-center">
+                <button
+                  onClick={() => {
+                    const data = StorageService.getFullBackup();
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `recnxt_backup_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                  }}
+                  className="py-4 bg-slate-50 border border-slate-200 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center justify-center"
+                >
                   <i className="fas fa-download mr-2"></i> Export Data
                 </button>
                 <button className="py-4 bg-slate-50 border border-slate-200 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center justify-center">
@@ -123,17 +137,17 @@ const Settings: React.FC = () => {
 
           <div className="space-y-6">
             <div className="bg-gradient-to-br from-indigo-600 to-violet-700 text-white p-10 rounded-[2.5rem] shadow-2xl shadow-indigo-500/30 flex flex-col items-center text-center relative overflow-hidden">
-               <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12">
-                 <i className="fas fa-crown text-8xl"></i>
-               </div>
-               <div className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center text-3xl mb-6 border border-white/20 backdrop-blur-md relative z-10">
-                 <i className="fas fa-gem"></i>
-               </div>
-               <h4 className="font-black text-2xl mb-2 tracking-tight relative z-10">{profile.plan} Access</h4>
-               <p className="text-indigo-100 text-xs mb-8 font-medium leading-relaxed relative z-10">You have full administrative privileges and unlimited AI tokens.</p>
-               <button className="w-full py-4 bg-white text-indigo-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:shadow-xl transition-all relative z-10">
-                 System Logs
-               </button>
+              <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12">
+                <i className="fas fa-crown text-8xl"></i>
+              </div>
+              <div className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center text-3xl mb-6 border border-white/20 backdrop-blur-md relative z-10">
+                <i className="fas fa-gem"></i>
+              </div>
+              <h4 className="font-black text-2xl mb-2 tracking-tight relative z-10">{profile.plan} Access</h4>
+              <p className="text-indigo-100 text-xs mb-8 font-medium leading-relaxed relative z-10">You have full administrative privileges and unlimited AI tokens.</p>
+              <button className="w-full py-4 bg-white text-indigo-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:shadow-xl transition-all relative z-10">
+                System Logs
+              </button>
             </div>
 
             <div className="bg-slate-900 text-slate-400 p-8 rounded-[2.5rem] border border-white/5">
