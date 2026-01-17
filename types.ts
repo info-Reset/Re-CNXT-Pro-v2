@@ -36,9 +36,10 @@ export interface Project {
   progress: number;
   startDate: string;
   endDate?: string;
-  externalLink?: string; 
+  externalLink?: string;
   driveLink?: string;
   sheetLink?: string;
+  notes?: string;
   tasks: Task[];
 }
 
