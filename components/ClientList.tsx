@@ -24,8 +24,8 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
   });
 
   const filteredClients = clients.filter(c => {
-    const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          c.company.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.company.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filter === 'All' || c.status === filter;
     return matchesSearch && matchesFilter;
   });
@@ -51,7 +51,7 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">Client Directory</h2>
           <p className="text-slate-500 font-medium">Managing {clients.length} relationships across your agency</p>
         </div>
-        <button 
+        <button
           onClick={() => setIsAddModalOpen(true)}
           className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-[1.5rem] font-black text-xs uppercase tracking-widest flex items-center justify-center transition-all shadow-lg shadow-indigo-600/20"
         >
@@ -63,8 +63,8 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
       <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 flex flex-col md:flex-row gap-6">
         <div className="relative flex-1">
           <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Search network..."
             className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 font-semibold text-slate-700"
             value={searchTerm}
@@ -76,11 +76,10 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
             <button
               key={s}
               onClick={() => setFilter(s as any)}
-              className={`px-4 py-2.5 text-[10px] rounded-xl font-black uppercase tracking-widest transition-all ${
-                filter === s 
-                ? 'bg-white text-indigo-600 shadow-sm' 
-                : 'text-slate-400 hover:text-slate-600'
-              }`}
+              className={`px-4 py-2.5 text-[10px] rounded-xl font-black uppercase tracking-widest transition-all ${filter === s
+                  ? 'bg-white text-indigo-600 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-600'
+                }`}
             >
               {s}
             </button>
@@ -96,14 +95,14 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
                 <th className="px-8 py-5">Profile</th>
                 <th className="px-8 py-5">Status</th>
                 <th className="px-8 py-5">Activity</th>
-                <th className="px-8 py-5">LTV</th>
+                <th className="px-8 py-5">CTV</th>
                 <th className="px-8 py-5"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredClients.map(client => (
-                <tr 
-                  key={client.id} 
+                <tr
+                  key={client.id}
                   className="hover:bg-indigo-50/30 cursor-pointer group transition-all"
                   onClick={() => onSelectClient(client)}
                 >
@@ -119,12 +118,11 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                      client.status === ClientStatus.ACTIVE ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 
-                      client.status === ClientStatus.LEAD ? 'bg-indigo-50 text-indigo-700 border-indigo-100' :
-                      client.status === ClientStatus.POTENTIAL ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                      'bg-slate-100 text-slate-500 border-slate-200'
-                    }`}>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${client.status === ClientStatus.ACTIVE ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                        client.status === ClientStatus.LEAD ? 'bg-indigo-50 text-indigo-700 border-indigo-100' :
+                          client.status === ClientStatus.POTENTIAL ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                            'bg-slate-100 text-slate-500 border-slate-200'
+                      }`}>
                       {client.status}
                     </span>
                   </td>
@@ -150,7 +148,7 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
         {filteredClients.length === 0 && (
           <div className="py-24 text-center">
             <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-200">
-               <i className="fas fa-user-slash text-3xl"></i>
+              <i className="fas fa-user-slash text-3xl"></i>
             </div>
             <p className="text-slate-400 font-black uppercase tracking-widest text-xs">No matching profiles found</p>
           </div>
@@ -160,82 +158,82 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
       {/* Add Client Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex justify-end animate-in fade-in duration-300">
-           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setIsAddModalOpen(false)}></div>
-           <div className="relative w-full max-w-lg bg-white h-full shadow-2xl p-10 flex flex-col animate-in slide-in-from-right duration-500 border-l border-slate-200">
-              <div className="flex justify-between items-center mb-10">
-                 <h3 className="text-2xl font-black text-slate-900 tracking-tight">Register New Profile</h3>
-                 <button onClick={() => setIsAddModalOpen(false)} className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
-                    <i className="fas fa-times"></i>
-                 </button>
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setIsAddModalOpen(false)}></div>
+          <div className="relative w-full max-w-lg bg-white h-full shadow-2xl p-10 flex flex-col animate-in slide-in-from-right duration-500 border-l border-slate-200">
+            <div className="flex justify-between items-center mb-10">
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight">Register New Profile</h3>
+              <button onClick={() => setIsAddModalOpen(false)} className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6 overflow-y-auto pr-4 flex-1 custom-scrollbar">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Legal Name</label>
+                <input
+                  required
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-300"
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Organization</label>
+                <input
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-300"
+                  value={formData.company}
+                  onChange={e => setFormData({ ...formData, company: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Email Address</label>
+                  <input
+                    type="email"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-300"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Phone Line</label>
+                  <input
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-300"
+                    value={formData.phone}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Initial Status</label>
+                <select
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10"
+                  value={formData.status}
+                  onChange={e => setFormData({ ...formData, status: e.target.value as ClientStatus })}
+                >
+                  <option value={ClientStatus.LEAD}>Fresh Start</option>
+                  <option value={ClientStatus.ACTIVE}>In Motion</option>
+                  <option value={ClientStatus.POTENTIAL}>On Deck</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Lead Intelligence Notes</label>
+                <textarea
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10 h-32 placeholder:text-slate-300"
+                  placeholder="Add initial thoughts, requirements, or discovery notes..."
+                  value={formData.notes}
+                  onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                />
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6 overflow-y-auto pr-4 flex-1 custom-scrollbar">
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Legal Name</label>
-                    <input 
-                      required
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-300"
-                      value={formData.name}
-                      onChange={e => setFormData({...formData, name: e.target.value})}
-                    />
-                 </div>
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Organization</label>
-                    <input 
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-300"
-                      value={formData.company}
-                      onChange={e => setFormData({...formData, company: e.target.value})}
-                    />
-                 </div>
-                 <div className="grid grid-cols-2 gap-4">
-                   <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Email Address</label>
-                      <input 
-                        type="email"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-300"
-                        value={formData.email}
-                        onChange={e => setFormData({...formData, email: e.target.value})}
-                      />
-                   </div>
-                   <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Phone Line</label>
-                      <input 
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10 placeholder:text-slate-300"
-                        value={formData.phone}
-                        onChange={e => setFormData({...formData, phone: e.target.value})}
-                      />
-                   </div>
-                 </div>
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Initial Status</label>
-                    <select 
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10"
-                      value={formData.status}
-                      onChange={e => setFormData({...formData, status: e.target.value as ClientStatus})}
-                    >
-                       <option value={ClientStatus.LEAD}>Fresh Start</option>
-                       <option value={ClientStatus.ACTIVE}>In Motion</option>
-                       <option value={ClientStatus.POTENTIAL}>On Deck</option>
-                    </select>
-                 </div>
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Lead Intelligence Notes</label>
-                    <textarea 
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/10 h-32 placeholder:text-slate-300"
-                      placeholder="Add initial thoughts, requirements, or discovery notes..."
-                      value={formData.notes}
-                      onChange={e => setFormData({...formData, notes: e.target.value})}
-                    />
-                 </div>
-
-                 <button 
-                  type="submit"
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-indigo-600/20 uppercase tracking-widest text-xs mt-4"
-                 >
-                   Finalize Registration
-                 </button>
-              </form>
-           </div>
+              <button
+                type="submit"
+                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-indigo-600/20 uppercase tracking-widest text-xs mt-4"
+              >
+                Finalize Registration
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>

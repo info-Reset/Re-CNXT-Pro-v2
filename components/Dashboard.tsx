@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { 
+import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   AreaChart, Area
 } from 'recharts';
@@ -13,11 +13,11 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ clients, onSelectClient }) => {
   const workspaceConfig: WorkspaceConfig = JSON.parse(localStorage.getItem('recnxt_workspace_config') || '{}');
-  const activeProjects = clients.reduce((acc, client) => 
+  const activeProjects = clients.reduce((acc, client) =>
     acc + client.projects.filter(p => p.status !== ProjectStatus.COMPLETED).length, 0);
-  
+
   const totalRevenue = clients.reduce((acc, c) => acc + c.totalRevenue, 0);
-  
+
   const revenueData = [
     { name: 'Jan', revenue: 4200 },
     { name: 'Feb', revenue: 5800 },
@@ -44,7 +44,7 @@ const Dashboard: React.FC<DashboardProps> = ({ clients, onSelectClient }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard icon="fa-users" label="Active Clients" value={clients.filter(c => c.status === ClientStatus.ACTIVE).length} color="indigo" />
         <MetricCard icon="fa-rocket" label="Open Projects" value={activeProjects} color="violet" />
-        <MetricCard icon="fa-hand-holding-dollar" label="LTV Revenue" value={`$${totalRevenue.toLocaleString()}`} color="emerald" />
+        <MetricCard icon="fa-hand-holding-dollar" label="CTV Revenue" value={`$${totalRevenue.toLocaleString()}`} color="emerald" />
         <MetricCard icon="fa-bolt" label="Conversion" value="14.2%" color="amber" />
       </div>
 
@@ -62,15 +62,15 @@ const Dashboard: React.FC<DashboardProps> = ({ clients, onSelectClient }) => {
               <AreaChart data={revenueData}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-                <Tooltip 
-                  contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}}
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                <Tooltip
+                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="#6366f1" fillOpacity={1} fill="url(#colorRev)" strokeWidth={3} />
               </AreaChart>
@@ -80,19 +80,19 @@ const Dashboard: React.FC<DashboardProps> = ({ clients, onSelectClient }) => {
 
         <div className="bg-slate-900 rounded-[2rem] p-8 text-white shadow-xl flex flex-col justify-between overflow-hidden relative">
           <div className="absolute top-0 right-0 p-12 opacity-5 scale-150">
-             <i className="fas fa-crown text-9xl"></i>
+            <i className="fas fa-crown text-9xl"></i>
           </div>
           <div className="relative z-10">
             <h3 className="font-bold text-lg mb-2">Agency Health</h3>
             <p className="text-slate-400 text-sm mb-6">Your agency score is higher than 84% of similar users.</p>
-            
+
             <div className="space-y-6">
               <HealthBar label="Lead Response Time" percent={92} color="bg-indigo-500" />
               <HealthBar label="Project Completion" percent={78} color="bg-emerald-500" />
               <HealthBar label="Client Retention" percent={85} color="bg-violet-500" />
             </div>
           </div>
-          
+
           <button className="relative z-10 mt-8 w-full py-4 bg-white/10 hover:bg-white/20 rounded-2xl font-bold text-sm transition-all border border-white/10 uppercase tracking-widest text-[10px]">
             View Performance Report
           </button>
@@ -106,8 +106,8 @@ const Dashboard: React.FC<DashboardProps> = ({ clients, onSelectClient }) => {
         </div>
         <div className="divide-y divide-slate-50 px-4 pb-4">
           {clients.filter(c => c.status === ClientStatus.LEAD).map(lead => (
-            <div 
-              key={lead.id} 
+            <div
+              key={lead.id}
               className="p-5 flex items-center justify-between hover:bg-slate-50 rounded-2xl cursor-pointer transition-all duration-200"
               onClick={() => onSelectClient(lead)}
             >
@@ -162,7 +162,7 @@ const HealthBar: React.FC<{ label: string, percent: number, color: string }> = (
       <span>{percent}%</span>
     </div>
     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-      <div className={`h-full ${color} rounded-full`} style={{width: `${percent}%`}}></div>
+      <div className={`h-full ${color} rounded-full`} style={{ width: `${percent}%` }}></div>
     </div>
   </div>
 );
