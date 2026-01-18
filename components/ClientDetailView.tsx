@@ -228,11 +228,7 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-2 gap-4">
-              <div>
-                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Revenue Projection</h3>
-                <p className="text-2xl font-black text-slate-900 tracking-tight">${client.totalRevenue.toLocaleString()}</p>
-              </div>
+            <div className="mt-8 pt-6 border-t border-slate-100">
               <div>
                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Total Engagements</h3>
                 <p className="text-2xl font-black text-slate-900 tracking-tight">{client.projects.length}</p>

@@ -51,7 +51,7 @@ export interface Client {
   email: string;
   phone: string;
   status: ClientStatus;
-  totalRevenue: number;
+  totalRevenue?: number;
   notes: string;
   projects: Project[];
   createdAt: string;

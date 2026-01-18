@@ -1,9 +1,5 @@
 
 import React from 'react';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  AreaChart, Area
-} from 'recharts';
 import { Client, ProjectStatus, ClientStatus, WorkspaceConfig } from '../types';
 
 interface DashboardProps {
@@ -16,13 +12,8 @@ const Dashboard: React.FC<DashboardProps> = ({ clients, onSelectClient }) => {
   const activeProjects = clients.reduce((acc, client) =>
     acc + client.projects.filter(p => p.status !== ProjectStatus.COMPLETED).length, 0);
 
-  const totalRevenue = clients.reduce((acc, c) => acc + c.totalRevenue, 0);
-
-  const revenueData = [
-    { name: 'Jan', revenue: 4200 },
-    { name: 'Feb', revenue: 5800 },
-    { name: 'Mar', revenue: totalRevenue },
-  ];
+  const totalTasks = clients.reduce((acc, client) =>
+    acc + client.projects.reduce((pAcc, p) => pAcc + p.tasks.length, 0), 0);
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -44,38 +35,17 @@ const Dashboard: React.FC<DashboardProps> = ({ clients, onSelectClient }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard icon="fa-users" label="Active Clients" value={clients.filter(c => c.status === ClientStatus.ACTIVE).length} color="indigo" />
         <MetricCard icon="fa-rocket" label="Open Projects" value={activeProjects} color="violet" />
-        <MetricCard icon="fa-hand-holding-dollar" label="CTV Revenue" value={`$${totalRevenue.toLocaleString()}`} color="emerald" />
-        <MetricCard icon="fa-bolt" label="Conversion" value="14.2%" color="amber" />
+        <MetricCard icon="fa-list-check" label="Target Milestones" value={totalTasks} color="emerald" />
+        <MetricCard icon="fa-bolt" label="Efficiency" value="94.2%" color="amber" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="font-bold text-slate-800 text-lg">Growth Trajectory</h3>
-            <select className="bg-slate-50 border-none text-xs font-bold text-slate-500 rounded-lg focus:ring-0 cursor-pointer">
-              <option>Last 3 Months</option>
-              <option>Last Year</option>
-            </select>
+        <div className="lg:col-span-2 bg-gradient-to-br from-slate-50 to-white p-8 rounded-[2rem] shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mb-4 border border-indigo-100">
+            <i className="fas fa-chart-line"></i>
           </div>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={revenueData}>
-                <defs>
-                  <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <Tooltip
-                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                />
-                <Area type="monotone" dataKey="revenue" stroke="#6366f1" fillOpacity={1} fill="url(#colorRev)" strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Project Velocity</h3>
+          <p className="text-slate-500 max-w-sm">Strategic growth is driven by project completion and client satisfaction, not just numbers. focus on delivery.</p>
         </div>
 
         <div className="bg-slate-900 rounded-[2rem] p-8 text-white shadow-xl flex flex-col justify-between overflow-hidden relative">

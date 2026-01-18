@@ -35,7 +35,6 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
     const newClient: Client = {
       id: Date.now().toString(),
       ...formData,
-      totalRevenue: 0,
       projects: [],
       createdAt: new Date().toISOString()
     };
@@ -95,7 +94,6 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
                 <th className="px-8 py-5">Profile</th>
                 <th className="px-8 py-5">Status</th>
                 <th className="px-8 py-5">Engagement Count</th>
-                <th className="px-8 py-5">CTV</th>
                 <th className="px-8 py-5"></th>
               </tr>
             </thead>
@@ -137,9 +135,6 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onSelectClient, onAddC
                         </p>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <p className="text-sm font-black text-slate-900">${client.totalRevenue.toLocaleString()}</p>
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-indigo-600 group-hover:text-white transition-all">
