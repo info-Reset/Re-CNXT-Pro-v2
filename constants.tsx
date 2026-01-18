@@ -67,6 +67,13 @@ export const MOCK_CLIENTS: Client[] = [
   }
 ];
 
+export const DEFAULT_SERVICE_COSTS = {
+  'Website': 2500,
+  'Marketing': 1500,
+  'SEO': 1200,
+  'PPC': 1000,
+};
+
 export const COLORS = {
   primary: '#2563eb',
   secondary: '#64748b',

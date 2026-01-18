@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Client, ProjectStatus, ClientStatus, CreativeMockup, Project, Task } from '../types';
 import { analyzeLead, draftEmail, generateMockup } from '../services/geminiService';
+import { DEFAULT_SERVICE_COSTS } from '../constants';
 
 interface ClientDetailViewProps {
   client: Client;
@@ -20,7 +21,8 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
   const [newProjectData, setNewProjectData] = useState({
     name: '',
     type: 'Website' as Project['type'],
-    startDate: new Date().toISOString().split('T')[0]
+    startDate: new Date().toISOString().split('T')[0],
+    estimatedCost: DEFAULT_SERVICE_COSTS['Website']
   });
 
   const [mockupPrompt, setMockupPrompt] = useState('');
@@ -80,6 +82,7 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
       status: ProjectStatus.PLANNING,
       progress: 0,
       startDate: newProjectData.startDate,
+      estimatedCost: newProjectData.estimatedCost,
       tasks: []
     };
 
@@ -89,7 +92,8 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
     setNewProjectData({
       name: '',
       type: 'Website',
-      startDate: new Date().toISOString().split('T')[0]
+      startDate: new Date().toISOString().split('T')[0],
+      estimatedCost: DEFAULT_SERVICE_COSTS['Website']
     });
   };
 
@@ -265,18 +269,6 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
             </div>
           </div>
 
-          <div className="bg-rose-50 border border-rose-100 p-6 rounded-[2rem]">
-            <h3 className="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-4 px-1 flex items-center">
-              <i className="fas fa-triangle-exclamation mr-2"></i>
-              Danger Zone
-            </h3>
-            <button
-              onClick={handleDelete}
-              className="w-full bg-rose-600 hover:bg-rose-700 text-white font-black text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-lg shadow-rose-600/10"
-            >
-              Delete Profile
-            </button>
-          </div>
         </div>
 
         <div className="lg:col-span-2 space-y-6">
@@ -387,6 +379,12 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{project.type}</span>
                         <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
                         <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Started {new Date(project.startDate).toLocaleDateString()}</span>
+                        {project.estimatedCost && (
+                          <>
+                            <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Est. ${project.estimatedCost.toLocaleString()}</span>
+                          </>
+                        )}
                       </div>
                     </div>
                     <select
@@ -510,6 +508,19 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
               )}
             </div>
           </div>
+
+          <div className="bg-rose-50/50 border border-rose-100/50 p-6 rounded-[1.5rem] mt-12 flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <i className="fas fa-triangle-exclamation text-rose-400 text-xs"></i>
+              <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest">Delete Profile</p>
+            </div>
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 bg-rose-100 hover:bg-rose-200 text-rose-600 font-bold text-[10px] uppercase tracking-widest rounded-lg transition-all"
+            >
+              Confirm Deletion
+            </button>
+          </div>
         </div>
       </div>
 
@@ -576,13 +587,31 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({ client, onBack, onU
                 <select
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-950 outline-none focus:ring-4 focus:ring-indigo-500/10"
                   value={newProjectData.type}
-                  onChange={e => setNewProjectData({ ...newProjectData, type: e.target.value as Project['type'] })}
+                  onChange={e => {
+                    const newType = e.target.value as Project['type'];
+                    setNewProjectData({
+                      ...newProjectData,
+                      type: newType,
+                      estimatedCost: DEFAULT_SERVICE_COSTS[newType]
+                    });
+                  }}
                 >
                   <option value="Website">Website Building</option>
                   <option value="Marketing">Digital Marketing</option>
                   <option value="SEO">SEO Strategy</option>
                   <option value="PPC">PPC Management</option>
                 </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Estimated Cost ($)</label>
+                <input
+                  type="number"
+                  required
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 font-bold text-slate-950 outline-none focus:ring-4 focus:ring-indigo-500/10"
+                  value={newProjectData.estimatedCost}
+                  onChange={e => setNewProjectData({ ...newProjectData, estimatedCost: parseInt(e.target.value) || 0 })}
+                />
               </div>
 
               <div className="space-y-2">

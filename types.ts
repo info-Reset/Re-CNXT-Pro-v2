@@ -40,6 +40,7 @@ export interface Project {
   driveLink?: string;
   sheetLink?: string;
   notes?: string;
+  estimatedCost?: number;
   tasks: Task[];
 }
 
